@@ -32,4 +32,5 @@ H-05). Each item lives in exactly one tracker. Decisions: `../hsrp-dms-be/docs/D
 
 | ID | Item | Commit |
 | --- | --- | --- |
+| F-08 | A rejected token (401) left the app on Home showing "Your session has ended" on every screen; found after the backend was reseeded. The API client now clears the session on a 401, so the app returns to sign-in; the offline queue is kept. Verified on the emulator. | "Return to sign-in on 401" commit |
 | — | Split out of the monorepo with its history; own .gitignore, docs, skill and pre-commit hook (D38, D41) | "Split from the monorepo" commit |

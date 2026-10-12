@@ -63,6 +63,8 @@ or signing keys.
 - Every write that can be retried (inward, fitment) goes through `SyncQueue` with one Idempotency-Key per record;
   never send these directly from a screen.
 - Errors: `unwrap()` turns RFC 7807 problems into `ApiException`; show them with `errorText()` / `ErrorBanner`.
+- Session: the OkHttp interceptor in `ApiClient` clears the stored token when an authenticated call gets 401, and
+  `MainActivity` then shows the sign-in screen. Don't handle 401 per screen; queued offline actions stay in Room.
 - Screens use the helpers in `ui/Common.kt` (`rememberLoad`, `LoadView`, `SectionCard`, `StatusChip`).
 - Cleartext HTTP is allowed in the **debug** build only (`app/src/debug`). Release builds require HTTPS.
 - The debug-only "Test photo" button exists for emulators without a camera; it must not ship in a release build.
@@ -94,6 +96,7 @@ It warns when code changes without any doc change.
 - `local.properties`: use forward slashes; backslashes are escape characters in properties files.
 - The emulator reaches the computer at `10.0.2.2`; a phone needs the computer's LAN IP and port 3000 open.
 - On the emulator, screenshots right after boot can be black while the GPU starts; wait and retry.
+- After the backend is reseeded (`docker compose down -v`), old tokens are rejected; the app drops back to sign-in.
 - WorkManager may take ~30 s after the network returns before the sync job runs.
 
 ## Where things are tracked

@@ -143,7 +143,11 @@ object ApiClient {
             val device = runBlocking { settings.deviceId() }
             val req = chain.request().newBuilder().header("X-Device-Id", device)
             if (token != null) req.header("Authorization", "Bearer $token")
-            chain.proceed(req.build())
+            val res = chain.proceed(req.build())
+            // A rejected token (expired, revoked, or issued by a reseeded server) drops the session so the app
+            // returns to sign-in instead of showing the error on every screen. The offline queue is kept.
+            if (res.code == 401 && token != null) runBlocking { settings.setSession(null, null) }
+            res
         }
         val client = OkHttpClient.Builder()
             .addInterceptor(auth)
