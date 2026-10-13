@@ -1,10 +1,10 @@
-# Tracker — hsrp-dms-android
+# Tracker — hsrp-mobile-app
 
 **Last reviewed:** 12 Oct 2026
 
 Items that touch only the dealer app. Items spanning repos, business questions and hardening are in the
-[backend tracker](../../hsrp-dms-be/docs/TRACKER.md) (several involve this app: P-01, P-02, P-03, P-05, P-10, V-03,
-H-05). Each item lives in exactly one tracker. Decisions: `../hsrp-dms-be/docs/DECISIONS.md`.
+[backend tracker](../../hsrp-be/docs/TRACKER.md) (several involve this app: P-01, P-02, P-03, P-05, P-10, V-03,
+H-05). Each item lives in exactly one tracker. Decisions: `../hsrp-be/docs/DECISIONS.md`.
 
 **Status:** Open · In progress · Blocked · Done — **Priority:** P1 breaks a demo flow · P2 needed before real use · P3 nice to have
 

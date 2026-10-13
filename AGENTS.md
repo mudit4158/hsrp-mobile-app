@@ -1,4 +1,4 @@
-# AGENTS.md — hsrp-dms-android
+# AGENTS.md — hsrp-mobile-app
 
 **Last updated:** 12 Oct 2026
 
@@ -15,10 +15,10 @@ sent when online, each with a fixed `Idempotency-Key`.
 
 | Sibling repo (under `C:\workspace\hsrp\`) | Relationship |
 | --- | --- |
-| `hsrp-dms-be` | The API this app calls; owns the contracts, the **decision log** and the system tracker |
-| `hsrp-dms-fe` | Web app; independent of this repo |
+| `hsrp-be` | The API this app calls; owns the contracts, the **decision log** and the system tracker |
+| `hsrp-fe` | Web app; independent of this repo |
 
-Decisions: `../hsrp-dms-be/docs/DECISIONS.md` and the
+Decisions: `../hsrp-be/docs/DECISIONS.md` and the
 [High-Level Design](https://claude.ai/code/artifact/d7fce61b-0fe9-4bae-a8b2-7286684b9de4).
 
 ## Layout
@@ -44,7 +44,7 @@ docs/TRACKER.md                 open items that touch only this repo
 
 Needs JDK 17 and the Android SDK (platform 35, build-tools 34+). `local.properties` must point at the SDK, e.g.
 `sdk.dir=C:/Users/<you>/AppData/Local/Android/Sdk` (forward slashes; it is git-ignored). The backend must be running
-(`hsrp-dms-be`: `docker compose up -d`).
+(`hsrp-be`: `docker compose up -d`).
 
 | Command | What it does |
 | --- | --- |
@@ -79,7 +79,7 @@ or signing keys.
   `GET /nodes` on 127.0.0.1:7777 inside the device (reach it with `adb forward tcp:7777 tcp:7777`) returns the
   visible Compose nodes and their bounds. It is loaded by reflection from `HsrpApp` only when `BuildConfig.DEBUG`,
   and does not exist in release builds. The simulator finds things by their visible text, so when you rename a
-  button or label it taps, update `hsrp-dms-be/sim/scenes/phone.ts` too.
+  button or label it taps, update `hsrp-be/sim/scenes/phone.ts` too.
 
 ## Safety
 
@@ -96,7 +96,7 @@ commit**. Use the **maintain-docs** skill (`.claude/skills/maintain-docs/SKILL.m
 | --- | --- |
 | Build, SDK, dependencies, default API URL | `README.md`, this file |
 | Screens, sync behaviour, conventions | this file; README if it changes how to use the app |
-| A design choice | new decision in `../hsrp-dms-be/docs/DECISIONS.md` **and** the HLD (append-only) |
+| A design choice | new decision in `../hsrp-be/docs/DECISIONS.md` **and** the HLD (append-only) |
 | Work only in this repo (done / found / deferred) | `docs/TRACKER.md` here |
 | Work spanning repos | the backend tracker |
 

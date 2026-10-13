@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
- * DEBUG BUILDS ONLY (app/src/debug). Lets the scripted simulator (`pnpm sim` in hsrp-dms-be) read what is on
+ * DEBUG BUILDS ONLY (app/src/debug). Lets the scripted simulator (`pnpm sim` in hsrp-be) read what is on
  * screen in milliseconds instead of the ~3 s an `uiautomator dump` takes. Answers `GET /nodes` on 127.0.0.1:7777
  * inside the emulator (reach it with `adb forward tcp:7777 tcp:7777`) with the visible Compose semantics nodes
  * and their screen bounds. It only reads; taps and typing still go through `adb shell input`, so they are real

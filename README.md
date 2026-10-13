@@ -1,4 +1,4 @@
-# hsrp-dms-android — HSRP Dealer app
+# hsrp-mobile-app — HSRP Dealer app
 
 The dealer Android app of the HSRP Dealer Management System prototype (Kotlin, Jetpack Compose). Dealers sign in,
 place and follow orders, inward delivery challans plate by plate, and record fitment with photos. Inward and fitment
@@ -6,12 +6,12 @@ work offline: they are queued on the phone and sent when the connection returns.
 
 | Repo | What |
 | --- | --- |
-| [hsrp-dms-be](../hsrp-dms-be) | API, database, mocks, seed, contracts, decision log — **start here** |
-| [hsrp-dms-fe](../hsrp-dms-fe) | Web app |
-| **hsrp-dms-android** (this) | Dealer app |
+| [hsrp-be](../hsrp-be) | API, database, mocks, seed, contracts, decision log — **start here** |
+| [hsrp-fe](../hsrp-fe) | Web app |
+| **hsrp-mobile-app** (this) | Dealer app |
 
-Open items: [docs/TRACKER.md](docs/TRACKER.md) and the [backend tracker](../hsrp-dms-be/docs/TRACKER.md) ·
-decisions: [hsrp-dms-be/docs/DECISIONS.md](../hsrp-dms-be/docs/DECISIONS.md) · working in the repo: [AGENTS.md](AGENTS.md).
+Open items: [docs/TRACKER.md](docs/TRACKER.md) and the [backend tracker](../hsrp-be/docs/TRACKER.md) ·
+decisions: [hsrp-be/docs/DECISIONS.md](../hsrp-be/docs/DECISIONS.md) · working in the repo: [AGENTS.md](AGENTS.md).
 
 ## Build
 
@@ -31,7 +31,7 @@ The APK is `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Run
 
-Start the backend first (in `../hsrp-dms-be`: `docker compose up -d`).
+Start the backend first (in `../hsrp-be`: `docker compose up -d`).
 
 **Emulator:** start an emulator, then
 
