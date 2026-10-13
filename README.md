@@ -58,10 +58,11 @@ Sign in as `dealer.wb01` or `dealer.od02` (password = `SEED_PASSWORD` from the b
 | Home | Counts (to inward, to fit, in production, waiting for VAHAN), wallet, today's appointments; New order, Settings, Sign out |
 | Orders | Search and follow orders; New order (checked with VAHAN, priced, paid from the dealer wallet) |
 | Inward | Challans in transit; accept each plate or reject it with a reason |
-| Fitment | Search by registration → laser codes → confirm → front and rear photos (chassis optional) → submit |
+| Fitment | Search by registration → laser codes → confirm → front and rear photos (chassis optional) → submit. The server reads the registration number on each plate photo (OCR) and refuses the fitment if it does not match. |
 | Sync | The offline queue: Pending, Done or Failed with the reason; Sync now |
 
-Debug builds also show a "Test photo" button in the camera for emulators without a camera.
+Debug builds also show "Test photo" in the camera for emulators without a camera: it draws a plate with the order's
+registration number; "Test photo (wrong number)" draws another number to show the OCR refusal.
 
 ## Keeping the docs current
 

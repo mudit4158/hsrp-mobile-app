@@ -14,6 +14,10 @@ class HsrpApp : Application() {
         App.db = AppDb.get(this)
         // Send anything recorded offline as soon as the app starts with a connection.
         SyncQueue.kick(this)
+        // Debug builds only: the simulator's screen reader (app/src/debug, see AutomationBridge). Absent in release.
+        if (BuildConfig.DEBUG) {
+            runCatching { Class.forName("com.hsrp.dealer.debug.AutomationBridge").getMethod("start", Application::class.java).invoke(null, this) }
+        }
     }
 }
 

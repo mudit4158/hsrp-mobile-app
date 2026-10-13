@@ -31,7 +31,8 @@ app/src/main/java/com/hsrp/dealer/
   data/Db.kt                    Room: pending_action (offline queue)
   sync/Sync.kt                  SyncQueue (enqueue) + SyncWorker (sends with the stored Idempotency-Key)
   ui/                           Compose screens: Login, MainScaffold (nav), Home, Orders, Inward, Fitment, Camera, More
-app/src/debug/                  debug-only cleartext HTTP (network_security_config) for the local API
+app/src/debug/                  debug-only: cleartext HTTP (network_security_config) for the local API, and
+                                debug/AutomationBridge.kt (screen reader for the simulator, D44)
 app/build.gradle.kts            DEFAULT_API_URL (emulator: http://10.0.2.2:3000), dependencies
 scripts/docs-check.mjs          documentation checks (Node)
 docs/TRACKER.md                 open items that touch only this repo
@@ -67,7 +68,18 @@ or signing keys.
   `MainActivity` then shows the sign-in screen. Don't handle 401 per screen; queued offline actions stay in Room.
 - Screens use the helpers in `ui/Common.kt` (`rememberLoad`, `LoadView`, `SectionCard`, `StatusChip`).
 - Cleartext HTTP is allowed in the **debug** build only (`app/src/debug`). Release builds require HTTPS.
-- The debug-only "Test photo" button exists for emulators without a camera; it must not ship in a release build.
+- The debug-only "Test photo" button exists for emulators without a camera; it must not ship in a release build. For
+  plate photos it draws an HSRP-style plate with the order's registration number (and "Test photo (wrong number)"
+  draws another number) so the server's OCR (D45) has something real to read; the file ends with
+  `HSRP-PLATE:<number>` for the server's mock OCR adapter.
+- The server reads the registration number on each fitment plate photo (OCR, D45) and refuses the fitment if it is
+  not the order's number (HTTP 422 `plate-ocr-mismatch`); the Sync list shows it as failed with that reason, and
+  the dealer records the fitment again with new photos.
+- The automation bridge (`app/src/debug/.../AutomationBridge.kt`, D44) lets the backend's `pnpm sim` read the screen:
+  `GET /nodes` on 127.0.0.1:7777 inside the device (reach it with `adb forward tcp:7777 tcp:7777`) returns the
+  visible Compose nodes and their bounds. It is loaded by reflection from `HsrpApp` only when `BuildConfig.DEBUG`,
+  and does not exist in release builds. The simulator finds things by their visible text, so when you rename a
+  button or label it taps, update `hsrp-dms-be/sim/scenes/phone.ts` too.
 
 ## Safety
 
@@ -97,6 +109,7 @@ It warns when code changes without any doc change.
 - The emulator reaches the computer at `10.0.2.2`; a phone needs the computer's LAN IP and port 3000 open.
 - On the emulator, screenshots right after boot can be black while the GPU starts; wait and retry.
 - After the backend is reseeded (`docker compose down -v`), old tokens are rejected; the app drops back to sign-in.
+- `pnpm sim` (backend) taps through Inward and Fitment on the emulator; it turns on "show taps" (`show_touches`).
 - WorkManager may take ~30 s after the network returns before the sync job runs.
 
 ## Where things are tracked

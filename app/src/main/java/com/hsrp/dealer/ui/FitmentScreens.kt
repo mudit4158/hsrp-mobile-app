@@ -137,10 +137,17 @@ fun FitmentRecordScreen(nav: NavHostController) {
     val ready = confirmed && slots.filter { it.third }.all { photos[it.first] != null }
 
     camera?.let { kind ->
-        CameraCapture(kind, slots.first { it.first == kind }.second, onCaptured = { f ->
-            photos[kind] = f.path
-            camera = null
-        }, onCancel = { camera = null })
+        CameraCapture(
+            kind,
+            slots.first { it.first == kind }.second,
+            onCaptured = { f ->
+                photos[kind] = f.path
+                camera = null
+            },
+            onCancel = { camera = null },
+            // Plate photos are read by OCR on the server (D45); the debug test photo draws this number.
+            plateText = if (kind == "chassis") null else hit.order.regnNo,
+        )
         return
     }
 
@@ -185,7 +192,7 @@ fun FitmentRecordScreen(nav: NavHostController) {
                     }
                 },
             ) { Text("Submit fitment") }
-            Text("Saved on the phone first and sent now, or when the connection returns. VAHAN is updated by the server.", fontSize = 12.sp, color = Color(0xFF64748B))
+            Text("Saved on the phone first and sent now, or when the connection returns. The server reads the registration number on each plate photo (OCR) and refuses the fitment if it is not ${hit.order.regnNo}; VAHAN is updated by the server.", fontSize = 12.sp, color = Color(0xFF64748B))
         }
     }
 }

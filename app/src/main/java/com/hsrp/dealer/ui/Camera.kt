@@ -67,21 +67,65 @@ fun shrinkPhoto(file: File) {
     FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.JPEG, 80, it) }
 }
 
-/** Debug builds only: a generated image for emulators without a camera. */
-fun testPhoto(context: Context, kind: String, label: String): File {
-    val bmp = Bitmap.createBitmap(800, 500, Bitmap.Config.ARGB_8888)
+/** "WB02KF5437" → "WB 02 KF 5437", the way the plate prints it. */
+fun spacedPlate(regnNo: String): String {
+    val m = Regex("^([A-Z]{2})(\\d{1,2})([A-Z]{0,3})(\\d{1,4})$").find(regnNo.uppercase().replace(Regex("[^A-Z0-9]"), "")) ?: return regnNo
+    return m.groupValues.drop(1).filter { it.isNotEmpty() }.joinToString(" ")
+}
+
+/** Another vehicle's number: the last digit changed. Used by the debug "wrong number" test photo. */
+fun wrongPlate(regnNo: String): String {
+    val last = regnNo.last().digitToIntOrNull() ?: return regnNo + "7"
+    return regnNo.dropLast(1) + ((last + 3) % 10)
+}
+
+/**
+ * Debug builds only: a generated image for emulators without a camera. For a plate photo it draws an HSRP-style plate
+ * with `plateText`, so the server's OCR (D45) can read it, and ends the file with "HSRP-PLATE:<text>" for the
+ * server's mock OCR adapter.
+ */
+fun testPhoto(context: Context, kind: String, label: String, plateText: String? = null): File {
+    val bmp = Bitmap.createBitmap(960, 520, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
-    canvas.drawColor(android.graphics.Color.rgb(230, 236, 245))
-    val paint = Paint().apply { color = android.graphics.Color.rgb(30, 58, 138); textSize = 48f; isAntiAlias = true }
-    canvas.drawText("TEST PHOTO · $kind", 40f, 120f, paint)
-    canvas.drawText(label, 40f, 220f, paint)
+    val text = Paint().apply { isAntiAlias = true }
+    if (plateText != null) {
+        canvas.drawColor(android.graphics.Color.rgb(84, 99, 112))
+        val fill = Paint().apply { color = android.graphics.Color.WHITE }
+        canvas.drawRect(70f, 170f, 890f, 350f, fill)
+        val border = Paint().apply { color = android.graphics.Color.rgb(17, 24, 39); style = Paint.Style.STROKE; strokeWidth = 7f }
+        canvas.drawRect(78f, 178f, 882f, 342f, border)
+        canvas.drawRect(84f, 184f, 148f, 336f, Paint().apply { color = android.graphics.Color.rgb(29, 78, 216) })
+        text.color = android.graphics.Color.WHITE
+        text.textSize = 24f
+        text.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        canvas.drawText("IND", 92f, 320f, text)
+        text.color = android.graphics.Color.rgb(17, 24, 39)
+        text.textSize = 100f
+        val plate = spacedPlate(plateText)
+        // Shrink long numbers to fit the plate.
+        while (text.measureText(plate) > 690f && text.textSize > 40f) text.textSize -= 4f
+        canvas.drawText(plate, 170f, 297f, text)
+        text.color = android.graphics.Color.argb(220, 255, 255, 255)
+        text.textSize = 20f
+        text.typeface = android.graphics.Typeface.DEFAULT
+        canvas.drawText("TEST PHOTO · $label", 24f, 500f, text)
+    } else {
+        canvas.drawColor(android.graphics.Color.rgb(230, 236, 245))
+        text.color = android.graphics.Color.rgb(30, 58, 138)
+        text.textSize = 48f
+        canvas.drawText("TEST PHOTO · $kind", 40f, 120f, text)
+        canvas.drawText(label, 40f, 220f, text)
+    }
     val file = photoFile(context, kind)
-    FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.JPEG, 80, it) }
+    FileOutputStream(file).use {
+        bmp.compress(Bitmap.CompressFormat.JPEG, 90, it)
+        if (plateText != null) it.write("HSRP-PLATE:${spacedPlate(plateText)}".toByteArray())
+    }
     return file
 }
 
 @Composable
-fun CameraCapture(kind: String, label: String, onCaptured: (File) -> Unit, onCancel: () -> Unit) {
+fun CameraCapture(kind: String, label: String, onCaptured: (File) -> Unit, onCancel: () -> Unit, plateText: String? = null) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var granted by remember { mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
@@ -141,8 +185,15 @@ fun CameraCapture(kind: String, label: String, onCaptured: (File) -> Unit, onCan
                     },
                 ) { Text(if (busy) "Saving…" else "Take photo") }
                 if (!granted) OutlinedButton(onClick = { launcher.launch(Manifest.permission.CAMERA) }) { Text("Allow camera", color = Color.White) }
-                if (BuildConfig.DEBUG) OutlinedButton(onClick = { onCaptured(testPhoto(context, kind, label)) }) { Text("Test photo", color = Color.White) }
                 OutlinedButton(onClick = onCancel) { Text("Cancel", color = Color.White) }
+            }
+            if (BuildConfig.DEBUG) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { onCaptured(testPhoto(context, kind, label, plateText)) }) { Text("Test photo", color = Color.White) }
+                    if (plateText != null) {
+                        OutlinedButton(onClick = { onCaptured(testPhoto(context, kind, label, wrongPlate(plateText))) }) { Text("Test photo (wrong number)", color = Color.White) }
+                    }
+                }
             }
         }
     }
